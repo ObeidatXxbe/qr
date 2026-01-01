@@ -110,18 +110,30 @@
     </div>
   </div>
 
-  <script>
+<script>
+(() => {
+  // Show any JS errors on the page (so you don't need DevTools)
+  window.addEventListener("error", (e) => {
+    const board = document.getElementById("board");
+    if (board) {
+      board.innerHTML =
+        `<p class="muted" style="color:#f87171;font-weight:800;">
+          JavaScript error: ${String(e.message || e.error || "Unknown")}
+        </p>`;
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
     // =========================
     // Supabase (SAFE INIT)
     // =========================
     const SUPABASE_URL = "https://fagdpkcckpyhmmgmaqik.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_w3_sZUpV1LsChEuJGVWRnw_NLk17WPs";
 
-    // If Supabase CDN fails or is blocked, we don't want the whole quiz to break.
     let supabaseClient = null;
     try {
       supabaseClient = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY) || null;
-    } catch (e) {
+    } catch (_) {
       supabaseClient = null;
     }
 
@@ -190,6 +202,12 @@
     const msg = document.getElementById("msg");
     const boardEl = document.getElementById("board");
 
+    // If any of these are null, your HTML ids don't match (this will show you immediately)
+    if (!nameInput || !startBtn || !quizCard || !questionsEl || !scoreEl || !totalEl || !playerLabel || !finishBtn || !resetBtn || !msg || !boardEl) {
+      if (boardEl) boardEl.innerHTML = `<p class="muted" style="color:#f87171;font-weight:800;">Missing HTML element IDs. Check that id="startBtn", id="quizCard", etc. exist.</p>`;
+      return;
+    }
+
     totalEl.textContent = QUIZ.length;
 
     let answers = new Array(QUIZ.length).fill(null);
@@ -229,7 +247,6 @@
       });
     }
 
-    // Selection does NOT reveal correct answers until submit
     function select(qIndex, choice, btn, container){
       if (revealed) return;
 
@@ -268,31 +285,23 @@
         opts.forEach(b => b.classList.remove("ok","bad","picked"));
 
         if(opts[correct]) opts[correct].classList.add("ok");
-
-        if(chosen !== null && chosen !== correct && opts[chosen]) {
-          opts[chosen].classList.add("bad");
-        }
+        if(chosen !== null && chosen !== correct && opts[chosen]) opts[chosen].classList.add("bad");
 
         exp.textContent = (chosen === correct ? "✅ " : "⚠️ ") + item.explain;
       });
     }
 
-    // =========================
-    // Shared scoreboard via Supabase
-    // =========================
     async function saveScore(name, score){
-      if(!supabaseClient) return; // don't break quiz if Supabase didn't load
-
+      if(!supabaseClient) return; // quiz still works even if Supabase fails
       const { error } = await supabaseClient
         .from("scores")
         .insert([{ name, score, total: QUIZ.length }]);
-
       if (error) throw error;
     }
 
     async function loadBoard(){
       if(!supabaseClient){
-        boardEl.innerHTML = `<p class="muted">Leaderboard unavailable (Supabase didn’t load). The quiz still works.</p>`;
+        boardEl.innerHTML = `<p class="muted">Leaderboard unavailable (Supabase didn’t load). Quiz still works.</p>`;
         return;
       }
 
@@ -306,7 +315,7 @@
         .limit(10);
 
       if (error || !data) {
-        boardEl.innerHTML = `<p class="muted">Failed to load leaderboard.</p>`;
+        boardEl.innerHTML = `<p class="muted" style="color:#f87171;">Failed to load leaderboard.</p>`;
         return;
       }
 
@@ -326,18 +335,15 @@
 
       boardEl.innerHTML = `
         <table>
-          <thead>
-            <tr><th>#</th><th>Nickname</th><th>Score</th><th>When</th></tr>
-          </thead>
+          <thead><tr><th>#</th><th>Nickname</th><th>Score</th><th>When</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       `;
     }
 
-    // =========================
-    // Events
-    // =========================
-    startBtn.addEventListener("click", () => {
+    // ---- Start quiz (as a named function so we can force it if needed)
+    function startQuiz(){
+      // quick sanity check: if you click and see nothing, JS isn't running
       const name = sanitizeName(nameInput.value);
       if(!name){
         alert("Please enter a nickname.");
@@ -356,22 +362,17 @@
 
       renderQuestions();
       quizCard.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    }
 
-    // Press Enter in nickname box to start
-    nameInput.addEventListener("keydown", (e) => {
-      if(e.key === "Enter") startBtn.click();
-    });
+    // Attach handlers (this is what was likely never happening)
+    startBtn.addEventListener("click", startQuiz);
+    nameInput.addEventListener("keydown", (e) => { if(e.key === "Enter") startQuiz(); });
 
     finishBtn.addEventListener("click", async () => {
       const name = sanitizeName(nameInput.value);
-      if(!name){
-        alert("Please enter a nickname.");
-        return;
-      }
+      if(!name){ alert("Please enter a nickname."); return; }
 
-      const unanswered = answers.some(a => a === null);
-      if(unanswered){
+      if (answers.some(a => a === null)) {
         msg.textContent = "Answer all questions before saving your score.";
         msg.style.color = "#f87171";
         return;
@@ -385,8 +386,8 @@
         await loadBoard();
         msg.textContent = `Saved! ${name} scored ${score}/${QUIZ.length}.`;
         msg.style.color = "#4ade80";
-      } catch(e){
-        msg.textContent = "Could not save score. (Check Supabase table/RLS policies.)";
+      } catch {
+        msg.textContent = "Could not save score (check Supabase table/RLS).";
         msg.style.color = "#f87171";
       }
     });
@@ -400,8 +401,10 @@
       renderQuestions();
     });
 
-    // Load shared leaderboard on page load
+    // Load leaderboard on page load
     loadBoard();
-  </script>
+  });
+})();
+</script>
 </body>
 </html>
