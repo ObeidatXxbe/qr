@@ -19,97 +19,101 @@
       --accent2:#a50922;
     }
 
-    * { box-sizing: border-box; }
+    *{ box-sizing:border-box; }
 
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      margin: 0;
-      background: radial-gradient(1200px 500px at 20% 0%, rgba(135,7,28,0.35), transparent 60%),
-                  radial-gradient(900px 500px at 100% 20%, rgba(135,7,28,0.22), transparent 55%),
-                  var(--bg);
-      color: var(--text);
-      line-height: 1.6;
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,sans-serif;
+      color:var(--text);
+      line-height:1.6;
+      background:
+        radial-gradient(1200px 500px at 20% 0%, rgba(135,7,28,0.35), transparent 60%),
+        radial-gradient(900px 500px at 100% 20%, rgba(135,7,28,0.22), transparent 55%),
+        var(--bg);
     }
 
-    .wrap {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 44px 20px 70px;
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+      padding:44px 20px 70px;
     }
 
     /* HERO */
-    .hero {
-      display: grid;
+    .hero{
+      display:grid;
       grid-template-columns: 1.25fr 0.75fr; /* text | image */
-      align-items: center;
-      gap: 28px;
-      padding: 26px;
-      border-radius: 22px;
+      align-items:center;
+      gap:28px;
+      padding:26px;
+      border-radius:22px;
       background: linear-gradient(180deg, rgba(135,7,28,0.18), rgba(135,7,28,0.08));
-      border: 1px solid var(--border);
+      border:1px solid var(--border);
       backdrop-filter: blur(6px);
       box-shadow: 0 10px 40px rgba(0,0,0,0.35);
       margin-bottom: 22px;
     }
 
-    .hero-text { max-width: 620px; }
+    .hero-text{ max-width: 640px; }
 
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 14px;
-      border-radius: 999px;
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 14px;
+      border-radius:999px;
       background: rgba(135, 7, 28, 0.45);
       border: 1px solid var(--accent);
-      font-size: 0.88rem;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-      margin-bottom: 12px;
+      font-size:0.88rem;
+      font-weight:800;
+      letter-spacing:.2px;
+      margin-bottom:12px;
     }
 
-    h1 {
+    h1{
+      margin:0 0 10px;
+      color:var(--title);
       font-size: clamp(2.0rem, 3.3vw, 2.75rem);
-      line-height: 1.15;
-      margin: 0 0 10px;
-      color: var(--title);
-      letter-spacing: -0.4px;
+      line-height:1.15;
+      letter-spacing:-0.4px;
     }
 
-    p { margin: 0 0 10px; color: var(--muted); }
-
-    .hero-actions {
-      margin-top: 16px;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
+    p{
+      margin:0 0 10px;
+      color:var(--muted);
     }
 
-    .btn {
-      display: inline-block;
-      background: var(--accent);
-      color: white;
-      padding: 13px 20px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-weight: 800;
-      transition: transform 0.2s, background 0.2s;
-      border: 1px solid rgba(255,255,255,0.12);
+    .hero-actions{
+      margin-top:16px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .btn{
+      display:inline-block;
+      background:var(--accent);
+      color:#fff;
+      padding:13px 20px;
+      border-radius:12px;
+      text-decoration:none;
+      font-weight:900;
+      border:1px solid rgba(255,255,255,0.12);
       box-shadow: 0 10px 22px rgba(135,7,28,0.25);
+      transition: transform .2s, background .2s;
     }
-    .btn:hover { background: var(--accent2); transform: translateY(-2px); }
+    .btn:hover{ background:var(--accent2); transform: translateY(-2px); }
 
     .btn-ghost{
       display:inline-block;
-      padding: 13px 20px;
-      border-radius: 12px;
+      padding:13px 20px;
+      border-radius:12px;
       text-decoration:none;
-      font-weight: 800;
-      color: var(--text);
+      font-weight:900;
+      color:var(--text);
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.14);
-      transition: transform 0.2s, background 0.2s, border-color 0.2s;
+      transition: transform .2s, background .2s, border-color .2s;
     }
     .btn-ghost:hover{
       transform: translateY(-2px);
@@ -119,97 +123,78 @@
 
     .bunny-wrap{
       display:flex;
-      justify-content:flex-end; /* push bunny to the right */
+      justify-content:flex-end;
     }
-    .bunny-img {
+
+    .bunny-img{
       width: min(240px, 100%);
-      height: auto;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.12);
-      filter: drop-shadow(0 0 18px rgba(135, 7, 28, 0.45));
+      height:auto;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,0.12);
       box-shadow: 0 14px 40px rgba(0,0,0,0.35);
+      filter: drop-shadow(0 0 18px rgba(135, 7, 28, 0.45));
     }
 
     /* SECTIONS */
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      margin-top: 18px;
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:22px;
+      margin-top:18px;
       backdrop-filter: blur(5px);
     }
 
-    h2 {
-      font-size: 1.35rem;
-      margin: 0 0 14px;
-      color: var(--title2);
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-      letter-spacing: -0.2px;
+    h2{
+      font-size:1.35rem;
+      margin:0 0 14px;
+      color:var(--title2);
+      border-bottom:1px solid var(--border);
+      padding-bottom:8px;
+      letter-spacing:-0.2px;
     }
 
-    ol { margin: 12px 0 0 20px; }
-    li { margin: 10px 0; color: var(--muted); }
-    b { color: var(--text); }
+    ol{ margin:12px 0 0 20px; }
+    li{ margin:10px 0; color:var(--muted); }
+    b{ color:var(--text); }
+    .small{ font-size:0.95rem; opacity:0.9; color:var(--muted); }
 
-    .small { font-size: 0.95rem; opacity: 0.9; color: var(--muted); }
-
-    .grid {
-      display: grid;
+    .grid{
+      display:grid;
       grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 14px;
-    }
-    .grid .card {
-      margin-top: 0;
-      background: var(--card2);
-      padding: 16px;
+      gap:14px;
     }
 
-    /* QUIZ */
-    .quiz button {
-      width: 100%;
-      text-align: left;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(135, 7, 28, 0.45);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text);
-      cursor: pointer;
-      margin-bottom: 10px;
-      transition: all 0.2s;
-      font-weight: 650;
-    }
-    .quiz button:hover {
-      background: rgba(135, 7, 28, 0.22);
-      border-color: var(--accent);
-      transform: translateY(-1px);
+    .grid .mini{
+      background:var(--card2);
+      border:1px solid rgba(135,7,28,0.45);
+      border-radius:16px;
+      padding:16px;
     }
 
-    .ok { border-color: rgba(34,197,94,0.8) !important; background: rgba(34,197,94,0.12) !important; }
-    .bad { border-color: rgba(239,68,68,0.8) !important; background: rgba(239,68,68,0.12) !important; }
+    .footer-note{
+      margin-top: 18px;
+      font-size: 0.92rem;
+      color: rgba(252,236,238,0.68);
+    }
 
-    #result { margin-top: 14px; font-weight: 800; }
-
-    /* Mobile */
-    @media (max-width: 780px) {
+    @media (max-width: 780px){
       .hero{
-        grid-template-columns: 1fr;
-        text-align: left;
-        padding: 20px;
+        grid-template-columns:1fr;
+        padding:20px;
       }
       .bunny-wrap{
-        justify-content: center; /* center on mobile */
-        order: -1;              /* put bunny on top */
+        justify-content:center;
+        order:-1;
       }
-      .hero-actions{ justify-content: flex-start; }
+      .hero-actions{ justify-content:flex-start; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
 
-    <!-- HERO (text left, bunny right) -->
+    <!-- HERO -->
     <div class="hero">
       <div class="hero-text">
         <div class="pill">No login • No data collection</div>
@@ -218,12 +203,14 @@
 
         <div class="hero-actions">
           <a class="btn" href="#checklist">Show me the 10-second safety check</a>
-          <a class="btn-ghost" href="#quiz">Try the quick test</a>
+          <a class="btn-ghost" href="quiz.html">Take the quiz</a>
         </div>
+
+        <div class="footer-note">This page is an awareness project. It does not collect personal data.</div>
       </div>
 
       <div class="bunny-wrap">
-        <img src="bunny.jpg" alt="Knight Bunny" class="bunny-img">
+        <img src="bunny.png" alt="Knight Bunny" class="bunny-img">
       </div>
     </div>
 
@@ -242,59 +229,47 @@
     <div class="card">
       <h2>What could have happened?</h2>
       <div class="grid">
-        <div class="card">
+        <div class="mini">
           <b>Fake portal link</b>
           <p class="small">Tries to trick you into entering credentials (phishing).</p>
         </div>
-        <div class="card">
+        <div class="mini">
           <b>Payment trap</b>
           <p class="small">“Fine due”, “verification fee”, “parking ticket”.</p>
         </div>
-        <div class="card">
+        <div class="mini">
           <b>Malware / app prompt</b>
           <p class="small">Pushes an APK/app install or “security update”.</p>
         </div>
-        <div class="card">
+        <div class="mini">
           <b>Subscription scam</b>
           <p class="small">Hidden recurring charges via fake forms.</p>
         </div>
       </div>
     </div>
 
-    <div id="quiz" class="card quiz">
-      <h2>Quick test: which link is safest?</h2>
-      <p class="small">Pick one. (This is a demo — clicking here doesn’t open any pages.)</p>
-      <button onclick="pick(this,false)">https://universty-portal.com/login</button>
-      <button onclick="pick(this,false)">https://bit.ly/Uni-Verify-Now</button>
-      <button onclick="pick(this,true)">https://portal.university.edu</button>
-      <p id="result" class="small"></p>
-    </div>
-
     <div class="card">
-      <h2>Takeaway</h2>
-      <p style="color: var(--muted); margin: 0 0 6px;">
-        <b style="color: var(--text);">QR codes aren’t dangerous by themselves.</b> Rushing is the dangerous part.
-      </p>
-      <p class="small">Share this page with a friend who scans everything.</p>
+      <h2>Safe scanning habits</h2>
+      <div class="grid">
+        <div class="mini">
+          <b>Verify the source</b>
+          <p class="small">If it’s on a poster, check the official account/site of the organizer.</p>
+        </div>
+        <div class="mini">
+          <b>Type official URLs</b>
+          <p class="small">For portals/payments, type the site yourself instead of trusting the QR.</p>
+        </div>
+        <div class="mini">
+          <b>Be suspicious of urgency</b>
+          <p class="small">“Act now”, “account suspended”, “fine due today” are classic scam triggers.</p>
+        </div>
+        <div class="mini">
+          <b>Don’t install apps</b>
+          <p class="small">If scanning leads to an install prompt, stop and close it.</p>
+        </div>
+      </div>
     </div>
 
   </div>
-
-  <script>
-    function pick(btn, ok){
-      document.querySelectorAll('.quiz button').forEach(b=>{
-        b.classList.remove('ok','bad');
-      });
-
-      btn.classList.add(ok ? 'ok' : 'bad');
-
-      const result = document.getElementById('result');
-      result.textContent = ok
-        ? "✅ Correct — the real domain is clear and not shortened."
-        : "⚠️ Risky — look-alike domains and shortened links can hide the real destination.";
-
-      result.style.color = ok ? "#4ade80" : "#f87171";
-    }
-  </script>
 </body>
 </html>
