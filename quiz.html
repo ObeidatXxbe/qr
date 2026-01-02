@@ -5,19 +5,25 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>QR Safety Quiz</title>
 
-  <!-- Supabase JS (shared scoreboard) -->
+  <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root{
-      --bg:#120205; --card:rgba(135,7,28,0.12); --card2:rgba(135,7,28,0.18);
-      --border:rgba(135,7,28,0.35); --text:#fcecee; --muted:rgba(252,236,238,0.82);
-      --title:#ff4d6d; --title2:#ff8fa3; --accent:#87071c; --accent2:#a50922;
+      --bg:#120205;
+      --card:rgba(135,7,28,0.12);
+      --card2:rgba(135,7,28,0.18);
+      --border:rgba(135,7,28,0.35);
+      --text:#fcecee;
+      --muted:rgba(252,236,238,0.82);
+      --title:#ff4d6d;
+      --title2:#ff8fa3;
+      --accent:#87071c;
+      --accent2:#a50922;
     }
 
     *{box-sizing:border-box}
 
-    /* ✅ Fix the “middle band” / background seam */
     html{
       min-height:100%;
       background:
@@ -26,9 +32,10 @@
         var(--bg);
       background-attachment: fixed;
     }
+
     body{
-      min-height:100%;
       margin:0;
+      min-height:100%;
       font-family:system-ui,-apple-system,sans-serif;
       color:var(--text);
       background:transparent;
@@ -41,453 +48,286 @@
       min-height:100vh;
     }
 
-    /* ✅ Header with bunny */
     .top{
       display:flex;
-      gap:16px;
       align-items:center;
       justify-content:space-between;
       flex-wrap:wrap;
-    }
-    .top-left{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      min-width: 240px;
-    }
-    .top-right{
-      display:flex;
-      gap:14px;
-      align-items:center;
-      justify-content:flex-end;
-      flex-wrap:wrap;
-    }
-    .top-bunny{
-      width: 150px;            /* change this for bigger/smaller */
-      max-width: 100%;
-      height: auto;
-      border: none;
-      box-shadow: none;
-      filter: drop-shadow(0 0 22px rgba(135, 7, 28, 0.55));
-      user-select:none;
-      -webkit-user-drag:none;
+      gap:12px;
     }
 
-    h1{margin:0;color:var(--title);font-size:clamp(1.7rem,3vw,2.3rem);line-height:1.15}
-    p{margin:10px 0;color:var(--muted)}
-    .card{
-      background:var(--card); border:1px solid var(--border); border-radius:18px;
-      padding:22px; margin-top:18px; backdrop-filter:blur(6px)
+    h1{
+      margin:0;
+      color:var(--title);
+      font-size:clamp(1.7rem,3vw,2.3rem);
     }
-    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:22px;
+      margin-top:18px;
+      backdrop-filter:blur(6px);
+    }
+
+    /* ===== START QUIZ + BUNNY ===== */
+    .start-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+
+    .start-left{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
     input{
-      padding:12px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.14);
-      background:rgba(255,255,255,0.05); color:var(--text); min-width:220px;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.14);
+      background:rgba(255,255,255,0.05);
+      color:var(--text);
+      min-width:220px;
       outline:none;
     }
-    input:focus{border-color:rgba(255,255,255,0.25)}
+
     .btn{
-      display:inline-block; background:var(--accent); color:#fff; padding:12px 18px;
-      border-radius:12px; text-decoration:none; font-weight:800; border:1px solid rgba(255,255,255,0.12);
+      background:var(--accent);
+      color:#fff;
+      padding:12px 18px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.12);
+      font-weight:800;
       cursor:pointer;
     }
     .btn:hover{background:var(--accent2)}
+
     .btn-ghost{
-      display:inline-block; padding:12px 18px; border-radius:12px; text-decoration:none;
-      font-weight:800; color:var(--text);
-      background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.14);
-      cursor:pointer;
-    }
-    .btn-ghost:hover{background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.22)}
-
-    .q{
-      background:var(--card2); border:1px solid rgba(135,7,28,0.45); border-radius:16px;
-      padding:16px; margin-top:14px;
-    }
-    .q h2{margin:0 0 10px;color:var(--title2);font-size:1.1rem}
-    .opt{
-      width:100%; text-align:left; padding:12px 12px; border-radius:12px;
-      border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.05);
-      color:var(--text); cursor:pointer; margin:8px 0; font-weight:650;
-      transition: transform .15s, background .15s, border-color .15s;
-    }
-    .opt:hover{background:rgba(135,7,28,0.22); border-color:rgba(255,255,255,0.22); transform: translateY(-1px);}
-    .ok{border-color:rgba(34,197,94,0.8)!important; background:rgba(34,197,94,0.12)!important}
-    .bad{border-color:rgba(239,68,68,0.8)!important; background:rgba(239,68,68,0.12)!important}
-
-    /* ✅ Tech / cyber highlight for selected answer */
-    .picked{
-      outline:none;
-      border-color: rgba(56, 189, 248, 0.95) !important;
-      background: rgba(56, 189, 248, 0.12) !important;
-      box-shadow:
-        0 0 0 2px rgba(56, 189, 248, 0.35),
-        0 10px 22px rgba(0,0,0,0.28);
-    }
-    .picked::before{
-      content:"";
-      display:inline-block;
-      width:10px;
-      height:10px;
-      margin-right:10px;
-      border-radius:999px;
-      background: rgba(56, 189, 248, 0.95);
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
-      vertical-align: middle;
-    }
-    .opt.picked:hover{
-      background: rgba(56, 189, 248, 0.12) !important;
-      border-color: rgba(56, 189, 248, 0.95) !important;
-      transform:none;
+      padding:12px 18px;
+      border-radius:12px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.14);
+      color:var(--text);
+      font-weight:800;
+      text-decoration:none;
     }
 
-    .muted{color:var(--muted); font-size:0.95rem}
-    table{width:100%; border-collapse:collapse; margin-top:10px}
-    th,td{padding:10px 8px; border-bottom:1px solid rgba(255,255,255,0.08); text-align:left}
-    th{color:var(--title2); font-weight:800}
+    .quiz-bunny{
+      width:120px;
+      height:auto;
+      filter:drop-shadow(0 0 20px rgba(135,7,28,0.6));
+      pointer-events:none;
+    }
 
     @media (max-width:640px){
-      .top{gap:10px}
-      .top-bunny{width:120px}
+      .start-row{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+      .quiz-bunny{
+        align-self:center;
+        width:150px;
+        margin-top:10px;
+      }
     }
+
+    /* ===== QUIZ ===== */
+    .q{
+      background:var(--card2);
+      border:1px solid rgba(135,7,28,0.45);
+      border-radius:16px;
+      padding:16px;
+      margin-top:14px;
+    }
+
+    .q h2{
+      margin:0 0 10px;
+      color:var(--title2);
+      font-size:1.1rem;
+    }
+
+    .opt{
+      width:100%;
+      text-align:left;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.14);
+      background:rgba(255,255,255,0.05);
+      color:var(--text);
+      cursor:pointer;
+      margin:8px 0;
+      font-weight:650;
+    }
+
+    .opt:hover{
+      background:rgba(135,7,28,0.22);
+      transform:translateY(-1px);
+    }
+
+    .picked{
+      border-color:rgba(56,189,248,.95)!important;
+      background:rgba(56,189,248,.12)!important;
+      box-shadow:0 0 0 2px rgba(56,189,248,.35);
+    }
+
+    .ok{
+      border-color:rgba(34,197,94,.8)!important;
+      background:rgba(34,197,94,.12)!important;
+    }
+
+    .bad{
+      border-color:rgba(239,68,68,.8)!important;
+      background:rgba(239,68,68,.12)!important;
+    }
+
+    .muted{color:var(--muted);font-size:.95rem}
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+    }
+
+    th,td{
+      padding:10px 8px;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+
+    th{color:var(--title2)}
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="top">
-      <div class="top-left">
-        <h1>QR & Link Safety Quiz</h1>
+<div class="wrap">
+
+  <div class="top">
+    <h1>QR & Link Safety Quiz</h1>
+    <a class="btn-ghost" href="index.html">← Back</a>
+  </div>
+
+  <!-- START QUIZ CARD -->
+  <div class="card">
+    <div class="start-row">
+      <div class="start-left">
+        <label class="muted"><b>Enter a nickname:</b></label>
+        <input id="name" maxlength="18" placeholder="e.g. Obeidat">
+        <button class="btn" id="startBtn">Start quiz</button>
       </div>
 
-      <div class="top-right">
-        <!-- ✅ Put bunny.png in the same folder as quiz.html (or adjust the path) -->
-        <img src="bunny.png" alt="Knight Bunny" class="top-bunny">
-        <a class="btn-ghost" href="index.html">← Back</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="row">
-        <label for="name" class="muted" style="font-weight:700;">Enter a nickname:</label>
-        <input id="name" maxlength="18" placeholder="e.g., Obeidat" />
-        <button class="btn" id="startBtn" type="button">Start quiz</button>
-      </div>
-    </div>
-
-    <div class="card" id="quizCard" style="display:none;">
-      <div class="row" style="justify-content:space-between;">
-        <!-- ✅ Score hidden until submit -->
-        <div class="muted"><span id="playerLabel"></span> • Score: <b id="score">—</b>/<span id="total">0</span></div>
-        <button class="btn-ghost" id="resetBtn" type="button">Reset</button>
-      </div>
-
-      <div id="questions"></div>
-
-      <div class="row" style="margin-top:14px;">
-        <button class="btn" id="finishBtn" type="button">Finish & Save Score</button>
-      </div>
-
-      <p id="msg" class="muted" style="margin-top:12px;"></p>
-    </div>
-
-    <div class="card">
-      <h2 style="margin:0 0 10px;color:var(--title2);">Shared scoreboard</h2>
-      <p class="muted" style="margin:0;">Top 50 scores.</p>
-      <div id="board"></div>
+      <img src="bunny.png" class="quiz-bunny" alt="Knight Bunny">
     </div>
   </div>
 
-  <script>
-  (() => {
-    // Show any JS errors on the page (so you don't need DevTools)
-    window.addEventListener("error", (e) => {
-      const board = document.getElementById("board");
-      if (board) {
-        board.innerHTML =
-          `<p class="muted" style="color:#f87171;font-weight:800;">
-            JavaScript error: ${String(e.message || e.error || "Unknown")}
-          </p>`;
-      }
-    });
+  <!-- QUIZ -->
+  <div class="card" id="quizCard" style="display:none;">
+    <div class="muted">
+      <span id="playerLabel"></span> • Score: <b id="score">—</b>/<span id="total">0</span>
+    </div>
 
-    document.addEventListener("DOMContentLoaded", () => {
-      // =========================
-      // Supabase (SAFE INIT)
-      // =========================
-      const SUPABASE_URL = "https://fagdpkcckpyhmmgmaqik.supabase.co";
-      const SUPABASE_ANON_KEY = "sb_publishable_w3_sZUpV1LsChEuJGVWRnw_NLk17WPs";
+    <div id="questions"></div>
 
-      let supabaseClient = null;
-      try {
-        supabaseClient = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY) || null;
-      } catch (_) {
-        supabaseClient = null;
-      }
+    <button class="btn" id="finishBtn" style="margin-top:14px;">Finish & Save Score</button>
+    <p id="msg" class="muted"></p>
+  </div>
 
-      // =========================
-      // Quiz questions
-      // =========================
-      const QUIZ = [
-        {
-          q: "What is the safest first step after scanning an unknown QR?",
-          options: [
-            "Open the link immediately",
-            "Preview the URL and check the domain",
-            "Share it with friends to confirm",
-            "Turn off Wi-Fi and open it"
-          ],
-          correct: 1,
-          explain: "Previewing the URL and checking the domain helps you spot look-alikes and short links."
-        },
-        {
-          q: "Which link is the biggest red flag?",
-          options: [
-            "https://portal.university.edu",
-            "https://uni.edu/events",
-            "https://bit.ly/Verify-Uni-Now",
-            "https://library.university.edu"
-          ],
-          correct: 2,
-          explain: "Shortened links can hide the real destination. Be extra cautious."
-        },
-        {
-          q: "A QR page instantly asks you to install an app to continue. What should you do?",
-          options: [
-            "Install it and delete later",
-            "Close the page and don’t install anything",
-            "Install if it has a logo",
-            "Restart your phone then install"
-          ],
-          correct: 1,
-          explain: "Unexpected app installs from QR scans are a common malware route."
-        },
-        {
-          q: "HTTPS (the lock icon) means…",
-          options: [
-            "The site is definitely trustworthy",
-            "The connection is encrypted, but the site could still be a scam",
-            "The site is owned by your university",
-            "The site is virus-free"
-          ],
-          correct: 1,
-          explain: "HTTPS encrypts the connection, but scammers can also use HTTPS."
-        }
-      ];
+  <!-- SCOREBOARD -->
+  <div class="card">
+    <h2>Shared scoreboard</h2>
+    <p class="muted">Top 50 scores.</p>
+    <div id="board"></div>
+  </div>
 
-      // =========================
-      // DOM
-      // =========================
-      const nameInput = document.getElementById("name");
-      const startBtn = document.getElementById("startBtn");
-      const quizCard = document.getElementById("quizCard");
-      const questionsEl = document.getElementById("questions");
-      const scoreEl = document.getElementById("score");
-      const totalEl = document.getElementById("total");
-      const playerLabel = document.getElementById("playerLabel");
-      const finishBtn = document.getElementById("finishBtn");
-      const resetBtn = document.getElementById("resetBtn");
-      const msg = document.getElementById("msg");
-      const boardEl = document.getElementById("board");
+</div>
 
-      if (!nameInput || !startBtn || !quizCard || !questionsEl || !scoreEl || !totalEl || !playerLabel || !finishBtn || !resetBtn || !msg || !boardEl) {
-        if (boardEl) boardEl.innerHTML = `<p class="muted" style="color:#f87171;font-weight:800;">Missing HTML element IDs. Check that id="startBtn", id="quizCard", etc. exist.</p>`;
-        return;
-      }
+<script>
+(() => {
+  const SUPABASE_URL = "https://fagdpkcckpyhmmgmaqik.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_w3_sZUpV1LsChEuJGVWRnw_NLk17WPs";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      totalEl.textContent = QUIZ.length;
+  const QUIZ = [
+    {q:"Safest first step after scanning an unknown QR?",o:["Open it","Preview the URL","Share it","Disable Wi-Fi"],c:1},
+    {q:"Biggest red flag link?",o:["portal.edu","uni.edu","bit.ly/verify","library.edu"],c:2},
+    {q:"QR asks to install an app?",o:["Install","Close it","Install if logo","Restart then install"],c:1},
+    {q:"HTTPS means…",o:["Trusted","Encrypted only","University-owned","Virus-free"],c:1}
+  ];
 
-      let answers = new Array(QUIZ.length).fill(null);
-      let revealed = false;
+  const nameEl = document.getElementById("name");
+  const startBtn = document.getElementById("startBtn");
+  const quizCard = document.getElementById("quizCard");
+  const questionsEl = document.getElementById("questions");
+  const scoreEl = document.getElementById("score");
+  const totalEl = document.getElementById("total");
+  const playerLabel = document.getElementById("playerLabel");
+  const boardEl = document.getElementById("board");
+  const finishBtn = document.getElementById("finishBtn");
+  const msg = document.getElementById("msg");
 
-      function sanitizeName(s){
-        return (s || "").trim().replace(/\s+/g," ").slice(0,18);
-      }
+  totalEl.textContent = QUIZ.length;
+  let answers = Array(QUIZ.length).fill(null);
 
-      function escapeHtml(s){
-        return (s || "").replace(/[&<>"']/g, c => ({
-          "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-        })[c]);
-      }
-
-      function renderQuestions(){
-        questionsEl.innerHTML = "";
-        QUIZ.forEach((item, i) => {
-          const div = document.createElement("div");
-          div.className = "q";
-          div.innerHTML = `
-            <h2>Q${i+1}. ${item.q}</h2>
-            <div id="opts-${i}"></div>
-            <div class="muted" id="exp-${i}" style="margin-top:8px;"></div>
-          `;
-          questionsEl.appendChild(div);
-
-          const opts = div.querySelector(`#opts-${i}`);
-          item.options.forEach((opt, idx) => {
-            const btn = document.createElement("button");
-            btn.className = "opt";
-            btn.type = "button";
-            btn.textContent = opt;
-            btn.addEventListener("click", () => select(i, idx, btn, div));
-            opts.appendChild(btn);
-          });
-        });
-      }
-
-      function select(qIndex, choice, btn, container){
-        if (revealed) return;
-
-        answers[qIndex] = choice;
-
-        container.querySelectorAll(".opt").forEach(b => {
-          b.classList.remove("ok","bad","picked");
-        });
-
-        btn.classList.add("picked");
-
-        const exp = container.querySelector(`#exp-${qIndex}`);
-        exp.textContent = "";
-
-        // ✅ DO NOT updateScore() here (score stays hidden until submit)
-      }
-
-      function updateScore(){
-        const score = answers.reduce((acc, a, i) => acc + (a === QUIZ[i].correct ? 1 : 0), 0);
-        scoreEl.textContent = score;
-        return score;
-      }
-
-      function revealAll(){
-        revealed = true;
-
-        QUIZ.forEach((item, i) => {
-          const qBox = document.querySelectorAll(".q")[i];
-          if(!qBox) return;
-
-          const opts = qBox.querySelectorAll(".opt");
-          const exp = qBox.querySelector(`#exp-${i}`);
-          const correct = item.correct;
-          const chosen = answers[i];
-
-          opts.forEach(b => b.classList.remove("ok","bad","picked"));
-
-          if(opts[correct]) opts[correct].classList.add("ok");
-          if(chosen !== null && chosen !== correct && opts[chosen]) opts[chosen].classList.add("bad");
-
-          exp.textContent = (chosen === correct ? "✅ " : "⚠️ ") + item.explain;
-        });
-      }
-
-      async function saveScore(name, score){
-        if(!supabaseClient) return;
-        const { error } = await supabaseClient
-          .from("scores")
-          .insert([{ name, score, total: QUIZ.length }]);
-        if (error) throw error;
-      }
-
-      async function loadBoard(){
-        if(!supabaseClient){
-          boardEl.innerHTML = `<p class="muted">Leaderboard unavailable (Supabase didn’t load). Quiz still works.</p>`;
-          return;
-        }
-
-        boardEl.innerHTML = `<p class="muted">Loading leaderboard…</p>`;
-
-        const { data, error } = await supabaseClient
-          .from("scores")
-          .select("name, score, total, created_at")
-          .order("score", { ascending: false })
-          .order("created_at", { ascending: false })
-          .limit(50);
-
-        if (error || !data) {
-          boardEl.innerHTML = `<p class="muted" style="color:#f87171;">Failed to load leaderboard.</p>`;
-          return;
-        }
-
-        if (data.length === 0) {
-          boardEl.innerHTML = `<p class="muted">No scores yet. Be the first 🙂</p>`;
-          return;
-        }
-
-        const rows = data.map((x, i) => `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${escapeHtml(x.name)}</td>
-            <td><b>${x.score}</b> / ${x.total}</td>
-            <td class="muted">${new Date(x.created_at).toLocaleString()}</td>
-          </tr>
-        `).join("");
-
-        boardEl.innerHTML = `
-          <table>
-            <thead><tr><th>#</th><th>Nickname</th><th>Score</th><th>When</th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
-        `;
-      }
-
-      function startQuiz(){
-        const name = sanitizeName(nameInput.value);
-        if(!name){
-          alert("Please enter a nickname.");
-          return;
-        }
-
-        playerLabel.textContent = `Player: ${name}`;
-        quizCard.style.display = "block";
-
-        msg.textContent = "";
-        msg.style.color = "";
-
-        revealed = false;
-        answers = new Array(QUIZ.length).fill(null);
-        scoreEl.textContent = "—"; // ✅ keep hidden until submit
-
-        renderQuestions();
-        quizCard.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-
-      startBtn.addEventListener("click", startQuiz);
-      nameInput.addEventListener("keydown", (e) => { if(e.key === "Enter") startQuiz(); });
-
-      finishBtn.addEventListener("click", async () => {
-        const name = sanitizeName(nameInput.value);
-        if(!name){ alert("Please enter a nickname."); return; }
-
-        if (answers.some(a => a === null)) {
-          msg.textContent = "Answer all questions before saving your score.";
-          msg.style.color = "#f87171";
-          return;
-        }
-
-        revealAll();
-        const score = updateScore(); // ✅ score only calculated now
-
-        try{
-          await saveScore(name, score);
-          await loadBoard();
-          msg.textContent = `Saved! ${name} scored ${score}/${QUIZ.length}.`;
-          msg.style.color = "#4ade80";
-        } catch {
-          msg.textContent = "Could not save score (check Supabase table/RLS).";
-          msg.style.color = "#f87171";
-        }
+  function render(){
+    questionsEl.innerHTML="";
+    QUIZ.forEach((q,i)=>{
+      const d=document.createElement("div");
+      d.className="q";
+      d.innerHTML=`<h2>Q${i+1}. ${q.q}</h2>`;
+      q.o.forEach((t,j)=>{
+        const b=document.createElement("button");
+        b.className="opt";
+        b.textContent=t;
+        b.onclick=()=>{
+          answers[i]=j;
+          d.querySelectorAll(".opt").forEach(x=>x.classList.remove("picked"));
+          b.classList.add("picked");
+        };
+        d.appendChild(b);
       });
-
-      resetBtn.addEventListener("click", () => {
-        revealed = false;
-        answers = new Array(QUIZ.length).fill(null);
-        scoreEl.textContent = "—"; // ✅ hidden again
-        msg.textContent = "";
-        msg.style.color = "";
-        renderQuestions();
-      });
-
-      loadBoard();
+      questionsEl.appendChild(d);
     });
-  })();
-  </script>
+  }
+
+  startBtn.onclick=()=>{
+    if(!nameEl.value.trim()) return alert("Enter a nickname");
+    quizCard.style.display="block";
+    playerLabel.textContent="Player: "+nameEl.value.trim();
+    scoreEl.textContent="—";
+    answers.fill(null);
+    render();
+  };
+
+  finishBtn.onclick=async()=>{
+    if(answers.some(a=>a===null)) return alert("Answer all questions");
+    let score=answers.filter((a,i)=>a===QUIZ[i].c).length;
+    scoreEl.textContent=score;
+
+    await supabase.from("scores").insert([{name:nameEl.value,score,total:QUIZ.length}]);
+    loadBoard();
+    msg.textContent=`Saved! You scored ${score}/${QUIZ.length}`;
+  };
+
+  async function loadBoard(){
+    const {data}=await supabase.from("scores")
+      .select("*").order("score",{ascending:false}).limit(50);
+
+    if(!data||!data.length){
+      boardEl.innerHTML="<p class='muted'>No scores yet.</p>";
+      return;
+    }
+
+    boardEl.innerHTML="<table><tr><th>#</th><th>Name</th><th>Score</th></tr>"+
+      data.map((x,i)=>`<tr><td>${i+1}</td><td>${x.name}</td><td>${x.score}/${x.total}</td></tr>`).join("")
+      +"</table>";
+  }
+
+  loadBoard();
+})();
+</script>
 </body>
 </html>
