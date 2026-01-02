@@ -127,13 +127,14 @@
     }
 
     .bunny-img{
-      width: min(240px, 100%);
-      height:auto;
-      border-radius:20px;
-      border:1px solid rgba(255,255,255,0.12);
-      box-shadow: 0 14px 40px rgba(0,0,0,0.35);
-      filter: drop-shadow(0 0 18px rgba(135, 7, 28, 0.45));
+     width: min(240px, 100%);
+     height:auto;
+     border-radius: 0;          /* remove rounded box */
+     border: none;              /* remove border */
+     box-shadow: none;          /* remove box shadow */
+     filter: drop-shadow(0 0 22px rgba(135, 7, 28, 0.55)); /* soft glow only */
     }
+
 
     /* SECTIONS */
     .card{
