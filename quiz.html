@@ -271,6 +271,7 @@
 
   totalEl.textContent = QUIZ.length;
   let answers = Array(QUIZ.length).fill(null);
+  let scoreSaved = false; // Flag to prevent duplicate submissions
 
   function render(){
     questionsEl.innerHTML="";
@@ -303,13 +304,23 @@
   };
 
   finishBtn.onclick=async()=>{
-    if(answers.some(a=>a===null)) return alert("Answer all questions");
-    let score=answers.filter((a,i)=>a===QUIZ[i].c).length;
-    scoreEl.textContent=score;
+    if(scoreSaved) {
+      return; // Prevent duplicate submissions
+    }
 
-    await supabase.from("scores").insert([{name:nameEl.value,score,total:QUIZ.length}]);
+    if(answers.some(a=>a===null)) return alert("Answer all questions");
+
+    let score = answers.filter((a, i) => a === QUIZ[i].c).length;
+    scoreEl.textContent = score;
+
+    // Disable button and prevent duplicates
+    finishBtn.disabled = true;
+    scoreSaved = true;
+
+    // Save score
+    await supabase.from("scores").insert([{name: nameEl.value, score, total: QUIZ.length}]);
     loadBoard();
-    msg.textContent=`Saved! You scored ${score}/${QUIZ.length}`;
+    msg.textContent = `Saved! You scored ${score}/${QUIZ.length}`;
   };
 
   async function loadBoard(){
