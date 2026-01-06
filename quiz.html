@@ -273,7 +273,16 @@
   let answers = Array(QUIZ.length).fill(null);
   let scoreSaved = false; // Flag to prevent duplicate submissions
 
-  function render(){
+  async function isNicknameTaken(nickname){
+    // Query Supabase to check if the nickname already exists
+    const { data, error } = await supabase.from("scores")
+      .select("*")
+      .eq("name", nickname)
+      .single();
+    return !!data; // Return true if data exists (nickname is taken)
+  }
+
+  async function render(){
     questionsEl.innerHTML="";
     QUIZ.forEach((q,i)=>{
       const d=document.createElement("div");
@@ -294,23 +303,34 @@
     });
   }
 
-  startBtn.onclick=()=>{
-    if(!nameEl.value.trim()) return alert("Enter a nickname");
-    quizCard.style.display="block";
-    playerLabel.textContent="Player: "+nameEl.value.trim();
-    scoreEl.textContent="—";
+  startBtn.onclick = async () => {
+    const nickname = nameEl.value.trim();
+    if (!nickname) {
+      return alert("Enter a nickname");
+    }
+
+    // Check if the nickname is already taken
+    const taken = await isNicknameTaken(nickname);
+    if (taken) {
+      return alert("This nickname is already taken. Please choose another.");
+    }
+
+    // Start the quiz if the nickname is unique
+    quizCard.style.display = "block";
+    playerLabel.textContent = "Player: " + nickname;
+    scoreEl.textContent = "—";
     answers.fill(null);
     render();
   };
 
-  finishBtn.onclick=async()=>{
-    if(scoreSaved) {
+  finishBtn.onclick = async () => {
+    if (scoreSaved) {
       return; // Prevent duplicate submissions
     }
 
-    if(answers.some(a=>a===null)) return alert("Answer all questions");
+    if (answers.some(a => a === null)) return alert("Answer all questions");
 
-    let score = answers.filter((a, i) => a === QUIZ[i].c).length;
+    const score = answers.filter((a, i) => a === QUIZ[i].c).length;
     scoreEl.textContent = score;
 
     // Disable button and prevent duplicates
@@ -318,22 +338,24 @@
     scoreSaved = true;
 
     // Save score
-    await supabase.from("scores").insert([{name: nameEl.value, score, total: QUIZ.length}]);
+    await supabase.from("scores").insert([{ name: nameEl.value, score, total: QUIZ.length }]);
     loadBoard();
     msg.textContent = `Saved! You scored ${score}/${QUIZ.length}`;
   };
 
-  async function loadBoard(){
-    const {data}=await supabase.from("scores")
-      .select("*").order("score",{ascending:false}).limit(50);
+  async function loadBoard() {
+    const { data } = await supabase.from("scores")
+      .select("*")
+      .order("score", { ascending: false })
+      .limit(50);
 
-    if(!data||!data.length){
-      boardEl.innerHTML="<p class='muted'>No scores yet. Be the first one 😊</p>";
+    if(!data || !data.length){
+      boardEl.innerHTML = "<p class='muted'>No scores yet. Be the first one 😊</p>";
       return;
     }
 
-    boardEl.innerHTML="<table><tr><th>#</th><th>Name</th><th>Score</th></tr>"+
-      data.map((x,i)=>`<tr><td>${i+1}</td><td>${x.name}</td><td>${x.score}/${x.total}</td></tr>`).join("")
+    boardEl.innerHTML = "<table><tr><th>#</th><th>Name</th><th>Score</th></tr>"+
+      data.map((x,i) => `<tr><td>${i+1}</td><td>${x.name}</td><td>${x.score}/${x.total}</td></tr>`).join("")
       +"</table>";
   }
 
